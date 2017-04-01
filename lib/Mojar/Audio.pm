@@ -1,9 +1,8 @@
 package Mojar::Audio;
 use Mojo::Base -strict;
 
-our $VERSION = 0.001;
+our $VERSION = 0.101;
 
 1;
-__END__
 
 =head1 DESCRIPTION
