@@ -1,13 +1,14 @@
 package Mojar::Audacious;
 use Mojo::Base -base;
 
-our $VERSION = 0.201;
+our $VERSION = 0.301;
 
 use Carp qw(croak);
 use Net::DBus ();
+use Sub::Util qw(set_subname);
 
 has dbus => sub {
-  $ENV{DISPLAY} = ':0';
+  $ENV{DISPLAY} ||= ':0';
   eval {
     Net::DBus->session
       ->get_service('org.atheme.audacious')
@@ -20,496 +21,115 @@ has dbus => sub {
   }
 };
 
-# Begin generated
-
-sub version {
-  my $self = shift;
-  $self->dbus->Version(@_);
-}
-
-sub plugin_is_enabled {
-  my $self = shift;
-  $self->dbus->PluginIsEnabled(@_);
-}
-
-sub plugin_enable {
-  my $self = shift;
-  $self->dbus->PluginEnable(@_);
-  $self;
-}
-
-sub config_get {
-  my $self = shift;
-  $self->dbus->ConfigGet(@_);
-}
-
-sub config_set {
-  my $self = shift;
-  $self->dbus->ConfigSet(@_);
-  $self;
-}
-
-sub quit {
-  my $self = shift;
-  $self->dbus->Quit(@_);
-  $self;
-}
-
-sub eject {
-  my $self = shift;
-  $self->dbus->Eject(@_);
-  $self;
-}
-
-sub main_win_visible {
-  my $self = shift;
-  $self->dbus->MainWinVisible(@_);
-}
-
-sub show_main_win {
-  my $self = shift;
-  $self->dbus->ShowMainWin(@_);
-  $self;
-}
-
-sub startup_notify {
-  my $self = shift;
-  $self->dbus->StartupNotify(@_);
-  $self;
-}
-
-sub get_tuple_fields {
-  my $self = shift;
-  $self->dbus->GetTupleFields(@_);
-}
-
-sub play {
-  my $self = shift;
-  $self->dbus->Play(@_);
-  $self;
-}
-
-sub pause {
-  my $self = shift;
-  $self->dbus->Pause(@_);
-  $self;
-}
-
-sub play_pause {
-  my $self = shift;
-  $self->dbus->PlayPause(@_);
-  $self;
-}
-
-sub stop {
-  my $self = shift;
-  $self->dbus->Stop(@_);
-  $self;
-}
-
-sub playing {
-  my $self = shift;
-  $self->dbus->Playing(@_);
-}
-
-sub paused {
-  my $self = shift;
-  $self->dbus->Paused(@_);
-}
-
-sub stopped {
-  my $self = shift;
-  $self->dbus->Stopped(@_);
-}
-
-sub status {
-  my $self = shift;
-  $self->dbus->Status(@_);
-}
-
-sub record {
-  my $self = shift;
-  $self->dbus->Record(@_);
-  $self;
-}
-
-sub recording {
-  my $self = shift;
-  $self->dbus->Recording(@_);
-}
-
-sub info {
-  my $self = shift;
-  $self->dbus->Info(@_);
-}
-
-sub time {
-  my $self = shift;
-  $self->dbus->Time(@_);
-}
-
-sub seek {
-  my $self = shift;
-  $self->dbus->Seek(@_);
-  $self;
-}
-
-sub volume {
-  my $self = shift;
-  $self->dbus->Volume(@_);
-}
-
-sub set_volume {
-  my $self = shift;
-  $self->dbus->SetVolume(@_);
-  $self;
-}
-
-sub balance {
-  my $self = shift;
-  $self->dbus->Balance(@_);
-}
-
-sub position {
-  my $self = shift;
-  $self->dbus->Position(@_);
-}
-
-sub select_displayed_playlist {
-  my $self = shift;
-  $self->dbus->SelectDisplayedPlaylist(@_);
-}
-
-sub select_playing_playlist {
-  my $self = shift;
-  $self->dbus->SelectPlayingPlaylist(@_);
-}
-
-sub advance {
-  my $self = shift;
-  $self->dbus->Advance(@_);
-  $self;
-}
-
-sub advance_album {
-  my $self = shift;
-  $self->dbus->AdvanceAlbum(@_);
-  $self;
-}
-
-sub reverse {
-  my $self = shift;
-  $self->dbus->Reverse(@_);
-  $self;
-}
-
-sub reverse_album {
-  my $self = shift;
-  $self->dbus->ReverseAlbum(@_);
-  $self;
-}
-
-sub length {
-  my $self = shift;
-  $self->dbus->Length(@_);
-}
-
-sub song_title {
-  my $self = shift;
-  $self->dbus->SongTitle(@_);
-}
-
-sub song_filename {
-  my $self = shift;
-  $self->dbus->SongFilename(@_);
-}
-
-sub song_length {
-  my $self = shift;
-  $self->dbus->SongLength(@_);
-}
-
-sub song_frames {
-  my $self = shift;
-  $self->dbus->SongFrames(@_);
-}
-
-sub song_tuple {
-  my $self = shift;
-  $self->dbus->SongTuple(@_);
-}
-
-sub jump {
-  my $self = shift;
-  $self->dbus->Jump(@_);
-  $self;
-}
-
-sub add {
-  my $self = shift;
-  $self->dbus->Add(@_);
-  $self;
-}
-
-sub add_url {
-  my $self = shift;
-  $self->dbus->AddUrl(@_);
-  $self;
-}
-
-sub add_list {
-  my $self = shift;
-  $self->dbus->AddList(@_);
-  $self;
-}
-
-sub open_list {
-  my $self = shift;
-  $self->dbus->OpenList(@_);
-  $self;
-}
-
-sub open_list_to_temp {
-  my $self = shift;
-  $self->dbus->OpenListToTemp(@_);
-  $self;
-}
-
-sub delete {
-  my $self = shift;
-  $self->dbus->Delete(@_);
-  $self;
-}
-
-sub clear {
-  my $self = shift;
-  $self->dbus->Clear(@_);
-  $self;
-}
-
-sub auto_advance {
-  my $self = shift;
-  $self->dbus->AutoAdvance(@_);
-}
-
-sub toggle_auto_advance {
-  my $self = shift;
-  $self->dbus->ToggleAutoAdvance(@_);
-  $self;
-}
-
-sub repeat {
-  my $self = shift;
-  $self->dbus->Repeat(@_);
-}
-
-sub toggle_repeat {
-  my $self = shift;
-  $self->dbus->ToggleRepeat(@_);
-  $self;
-}
-
-sub shuffle {
-  my $self = shift;
-  $self->dbus->Shuffle(@_);
-}
-
-sub toggle_shuffle {
-  my $self = shift;
-  $self->dbus->ToggleShuffle(@_);
-  $self;
-}
-
-sub stop_after {
-  my $self = shift;
-  $self->dbus->StopAfter(@_);
-}
-
-sub toggle_stop_after {
-  my $self = shift;
-  $self->dbus->ToggleStopAfter(@_);
-  $self;
-}
-
-sub show_prefs_box {
-  my $self = shift;
-  $self->dbus->ShowPrefsBox(@_);
-  $self;
-}
-
-sub show_about_box {
-  my $self = shift;
-  $self->dbus->ShowAboutBox(@_);
-  $self;
-}
-
-sub show_jtf_box {
-  my $self = shift;
-  $self->dbus->ShowJtfBox(@_);
-  $self;
-}
-
-sub show_filebrowser {
-  my $self = shift;
-  $self->dbus->ShowFilebrowser(@_);
-  $self;
-}
-
-sub queue_get_list_pos {
-  my $self = shift;
-  $self->dbus->QueueGetListPos(@_);
-}
-
-sub queue_get_queue_pos {
-  my $self = shift;
-  $self->dbus->QueueGetQueuePos(@_);
-}
-
-sub get_info {
-  my $self = shift;
-  $self->dbus->GetInfo(@_);
-}
-
-sub get_playqueue_length {
-  my $self = shift;
-  $self->dbus->GetPlayqueueLength(@_);
-}
-
-sub playlist_ins_url_string {
-  my $self = shift;
-  $self->dbus->PlaylistInsUrlString(@_);
-  $self;
-}
-
-sub playlist_add {
-  my $self = shift;
-  $self->dbus->PlaylistAdd(@_);
-  $self;
-}
-
-sub playqueue_add {
-  my $self = shift;
-  $self->dbus->PlayqueueAdd(@_);
-  $self;
-}
-
-sub playqueue_remove {
-  my $self = shift;
-  $self->dbus->PlayqueueRemove(@_);
-  $self;
-}
-
-sub playqueue_clear {
-  my $self = shift;
-  $self->dbus->PlayqueueClear(@_);
-  $self;
-}
-
-sub playqueue_is_queued {
-  my $self = shift;
-  $self->dbus->PlayqueueIsQueued(@_);
-}
-
-sub playlist_enqueue_to_temp {
-  my $self = shift;
-  $self->dbus->PlaylistEnqueueToTemp(@_);
-  $self;
-}
-
-sub get_eq {
-  my $self = shift;
-  $self->dbus->GetEq(@_);
-}
-
-sub get_eq_preamp {
-  my $self = shift;
-  $self->dbus->GetEqPreamp(@_);
-}
-
-sub get_eq_band {
-  my $self = shift;
-  $self->dbus->GetEqBand(@_);
-}
-
-sub set_eq {
-  my $self = shift;
-  $self->dbus->SetEq(@_);
-  $self;
-}
-
-sub set_eq_preamp {
-  my $self = shift;
-  $self->dbus->SetEqPreamp(@_);
-  $self;
-}
-
-sub set_eq_band {
-  my $self = shift;
-  $self->dbus->SetEqBand(@_);
-  $self;
-}
-
-sub equalizer_activate {
-  my $self = shift;
-  $self->dbus->EqualizerActivate(@_);
-  $self;
-}
-
-sub number_of_playlists {
-  my $self = shift;
-  $self->dbus->NumberOfPlaylists(@_);
-}
-
-sub get_active_playlist {
-  my $self = shift;
-  $self->dbus->GetActivePlaylist(@_);
-}
-
-sub set_active_playlist {
-  my $self = shift;
-  $self->dbus->SetActivePlaylist(@_);
-  $self;
-}
-
-sub get_active_playlist_name {
-  my $self = shift;
-  $self->dbus->GetActivePlaylistName(@_);
-}
-
-sub set_active_playlist_name {
-  my $self = shift;
-  $self->dbus->SetActivePlaylistName(@_);
-  $self;
-}
-
-sub new_playlist {
-  my $self = shift;
-  $self->dbus->NewPlaylist(@_);
-  $self;
-}
-
-sub delete_active_playlist {
-  my $self = shift;
-  $self->dbus->DeleteActivePlaylist(@_);
-  $self;
-}
-
-sub play_active_playlist {
-  my $self = shift;
-  $self->dbus->PlayActivePlaylist(@_);
-  $self;
-}
-
-# End generated
+sub _add_method {
+  my ($titlecase, $cb) = @_;
+  my $snakecase = join '_', map lc($_), grep length($_), split /([A-Z][^A-Z]*)/, $titlecase;
+
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"__PACKAGE__::$snakecase"} = set_subname "__PACKAGE__::$snakecase", $cb;
+}
+
+# Getters
+_add_method $_, sub { shift->dbus->$_(@_) } for qw(
+  AutoAdvance
+  Balance
+  ConfigGet
+  GetActivePlaylist
+  GetActivePlaylistName
+  GetEq
+  GetEqBand
+  GetEqPreamp
+  GetInfo
+  GetPlayqueueLength
+  GetTupleFields
+  Info
+  Length
+  MainWinVisible
+  NumberOfPlaylists
+  Paused
+  Playing
+  PluginIsEnabled
+  Position
+  QueueGetListPos
+  QueueGetQueuePos
+  Recording
+  Repeat
+  SelectDisplayedPlaylist
+  SelectPlayingPlaylist
+  Shuffle
+  SongFilename
+  SongFrames
+  SongLength
+  SongTitle
+  SongTuple
+  Status
+  StopAfter
+  Stopped
+  Time
+  Version
+  Volume
+);
+
+# Setters and Others
+_add_method $_, sub { my $self = shift; $self->dbus->$_(@_); $self } for qw(
+  Add
+  AddList
+  AddUrl
+  Advance
+  AdvanceAlbum
+  Clear
+  ConfigSet
+  Delete
+  DeleteActivePlaylist
+  Eject
+  EqualizerActivate
+  Jump
+  NewPlaylist
+  OpenList
+  OpenListToTemp
+  Pause
+  Play
+  PlayActivePlaylist
+  PlaylistAdd
+  PlaylistEnqueueToTemp
+  PlaylistInsUrlString
+  PlayPause
+  PlayqueueAdd
+  PlayqueueClear
+  PlayqueueIsQueued
+  PlayqueueRemove
+  PluginEnable
+  Quit
+  Record
+  Reverse
+  ReverseAlbum
+  Seek
+  SetActivePlaylist
+  SetActivePlaylistName
+  SetEq
+  SetEqBand
+  SetEqPreamp
+  SetVolume
+  ShowAboutBox
+  ShowFilebrowser
+  ShowJtfBox
+  ShowMainWin
+  ShowPrefsBox
+  StartupNotify
+  Stop
+  ToggleAutoAdvance
+  ToggleRepeat
+  ToggleShuffle
+  ToggleStopAfter
+);
 
 sub find_in_playlist {
   my ($self, $uri) = @_;
 
   my $i = 0;
   my $length = $self->length;
-  while ($i < $length and $self->song_filename($i) ne $uri) {
-    ++$i;
-  }
+  ++$i while $i < $length and $self->song_filename($i) ne $uri;
   return $i < $length ? $i : undef;
 }
 
@@ -974,3 +594,181 @@ __DATA__
     <method name="PlayActivePlaylist" />
   </interface>
 </node>
+__END__
+
+=head1 GETTER METHODS
+
+=head2 auto_advance
+
+=head2 balance
+
+=head2 config_get
+
+=head2 get_active_playlist
+
+=head2 get_active_playlist_name
+
+=head2 get_eq
+
+=head2 get_eq_band
+
+=head2 get_eq_preamp
+
+=head2 get_info
+
+=head2 get_playqueue_length
+
+=head2 get_tuple_fields
+
+=head2 info
+
+=head2 length
+
+=head2 main_win_visible
+
+=head2 number_of_playlists
+
+=head2 paused
+
+=head2 playing
+
+=head2 plugin_is_enabled
+
+=head2 position
+
+=head2 queue_get_list_pos
+
+=head2 queue_get_queue_pos
+
+=head2 recording
+
+=head2 repeat
+
+=head2 select_displayed_playlist
+
+=head2 select_playing_playlist
+
+=head2 shuffle
+
+=head2 song_filename
+
+=head2 song_frames
+
+=head2 song_length
+
+=head2 song_title
+
+=head2 song_tuple
+
+=head2 status
+
+=head2 stop_after
+
+=head2 stopped
+
+=head2 time
+
+=head2 version
+
+=head2 volume
+
+=head1 SETTER METHODS
+
+=head2 add
+
+=head2 add_list
+
+=head2 add_url
+
+=head2 advance
+
+=head2 advance_album
+
+=head2 clear
+
+=head2 config_set
+
+=head2 delete
+
+=head2 delete_active_playlist
+
+=head2 eject
+
+=head2 equalizer_activate
+
+=head2 jump
+
+=head2 new_playlist
+
+=head2 open_list
+
+=head2 open_list_to_temp
+
+=head2 pause
+
+=head2 play
+
+=head2 play_active_playlist
+
+=head2 playlist_add
+
+=head2 playlist_enqueue_to_temp
+
+=head2 playlist_ins_url_string
+
+=head2 play_pause
+
+=head2 playqueue_add
+
+=head2 playqueue_clear
+
+=head2 playqueue_is_queued
+
+=head2 playqueue_remove
+
+=head2 plugin_enable
+
+=head2 quit
+
+=head2 record
+
+=head2 reverse
+
+=head2 reverse_album
+
+=head2 seek
+
+=head2 set_active_playlist
+
+=head2 set_active_playlist_name
+
+=head2 set_eq
+
+=head2 set_eq_band
+
+=head2 set_eq_preamp
+
+=head2 set_volume
+
+=head2 show_about_box
+
+=head2 show_filebrowser
+
+=head2 show_jtf_box
+
+=head2 show_main_win
+
+=head2 show_prefs_box
+
+=head2 startup_notify
+
+=head2 stop
+
+=head2 toggle_auto_advance
+
+=head2 toggle_repeat
+
+=head2 toggle_shuffle
+
+=head2 toggle_stop_after
+
