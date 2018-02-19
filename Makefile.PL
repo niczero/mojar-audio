@@ -23,7 +23,8 @@ WriteMakefile(
   BUILD_REQUIRES => {'Test::More' => 0},
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM => {
-    'Net::DBus' => 0,
+    'Mojolicious' => 9.15,
+    'Net::DBus' => '1.2.0'
   },
   EXE_FILES => [],
   test => {TESTS => 'test/*.t'}
