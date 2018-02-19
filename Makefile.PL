@@ -23,7 +23,7 @@ WriteMakefile(
   BUILD_REQUIRES => {'Test::More' => 0},
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM => {
-    'Net::DBus' => 0,
+    'Net::DBus' => 1.2,
   },
   EXE_FILES => [],
   test => {TESTS => 'test/*.t'}
