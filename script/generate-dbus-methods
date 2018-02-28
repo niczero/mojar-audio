@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use Mojo::Base -strict;
+
+use Mojar::Audacious ();
+use Mojo::DOM ();
+use Mojo::Loader qw(data_section);
+
+my $xml = data_section 'Mojar::Audacious', 'aud-dbus.xml';
+my %methods = (getters => {}, setters => {});
+
+Mojo::DOM->new($xml)
+    ->find('interface[name=org.atheme.audacious] method')->each(sub {
+
+  my $name = Mojar::Audacious::_snakecase($_->{name});
+  my $method = {
+    name => $name,
+    in   => [],
+    out  => [],
+  };
+
+  $_->find('arg[direction="out"]')->each(sub {
+    push @{$method->{out}}, $_->{name};
+  });
+  $_->find('arg[direction="in"]')->each(sub {
+    push @{$method->{in}}, $_->{name};
+  });
+
+  my $docn = "=item $name\n\n  ";
+
+  if (@{$method->{out}} == 1) {
+    my $val = $method->{out}[0];
+    $docn .= "\$$val = ";
+    $method->{type} = 'getter';
+  }
+  elsif (@{$method->{out}} > 1) {
+    my $vals = join q{, }, map "\$$_", @{$method->{out}};
+    $docn .= "($vals) = ";
+    $method->{type} = 'getter';
+  }
+
+  $method->{type} //= 'setter';
+
+  my $call = '$audacious->'. $name;
+
+  if (@{$method->{in}}) {
+    my $args = join q{, }, map "\$$_", @{$method->{in}};
+    $call .= "($args)";
+  }
+
+  $method->{pod} = $docn . $call ."\n\n";
+  $method->{test} = $method->{type} eq 'getter'
+    ? sprintf q{  ok defined(%s), 'called %s';}, $call, $name
+    : sprintf q{  ok %s, 'called %s';}, $call, $name;
+
+  $methods{$method->{type}}{$name} = $method;
+});
+
+print "=head2 Getters\n\n";
+print "=over 2\n\n";
+print $methods{getter}{$_}{pod} for sort keys %{$methods{getter}};
+print "=back\n\n";
+
+print "=head2 Setters and Actions\n\n";
+print "=over 2\n\n";
+print $methods{setter}{$_}{pod} for sort keys %{$methods{setter}};
+print "=back\n\n";
+
+say   $methods{getter}{$_}{test} for sort keys %{$methods{getter}};
+say   $methods{setter}{$_}{test} for sort keys %{$methods{setter}};

@@ -1,0 +1,16 @@
+bin/generate-dbus-methods
+Changes.md
+lib/Mojar/Audacious.pm
+lib/Mojar/Audio.pm
+lib/Mojolicious/Plugin/Audacious.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+test/0-load.t
+test/1-load-audacious.t
+test/3-methods.t
+test/4-party-time.t
+test/manifest.t
+test/pod.t

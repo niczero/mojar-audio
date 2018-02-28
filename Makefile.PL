@@ -11,21 +11,21 @@ WriteMakefile(
   AUTHOR       => 'Nic Sandfield <niczero@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => 5.016_001},
-    resources => {
+    dynamic_config => 0,
+    'meta-spec'    => {version => 2},
+    prereqs        => {runtime => {requires => {perl => '5.016'}}},
+    resources      => {
+      bugtracker => 'http://github.com/niczero/mojar-audio/issues',
       homepage   => 'http://niczero.github.io/mojar',
       license    => 'http://www.opensource.org/licenses/artistic-license-2.0',
       repository => 'http://github.com/niczero/mojar-audio',
-      bugtracker => 'http://github.com/niczero/mojar-audio/issues'
     },
     no_index => {directory => [qw(test)]}
   },
-  BUILD_REQUIRES => {'Test::More' => 0},
-  CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM => {
     'Mojolicious' => 9.15,
-    'Net::DBus' => '1.2.0'
+    'Net::DBus'   => '1.2.0',
   },
-  EXE_FILES => [],
+  EXE_FILES => ['script/generate-dbus-methods'],
   test => {TESTS => 'test/*.t'}
 );

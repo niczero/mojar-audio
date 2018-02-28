@@ -1,11 +1,11 @@
 package Mojar::Audacious;
 use Mojo::Base -base;
 
-our $VERSION = 0.301;
+our $VERSION = 0.401;
 
-use Carp qw(croak);
+use Mojo::Util ();
 use Net::DBus ();
-use Sub::Util qw(set_subname);
+use Time::HiRes ();
 
 has dbus => sub {
   $ENV{DISPLAY} ||= ':0';
@@ -17,21 +17,24 @@ has dbus => sub {
   or do {
     my $e = "Failed to access DBUS ($@)";
     $e .= ' Audacious not running.' if $e =~ /Error.ServiceUnknown/;
-    croak $e;
+    die $e;
   }
 };
 
-sub _add_method {
-  my ($titlecase, $cb) = @_;
-  my $snakecase = join '_', map lc($_), grep length($_), split /([A-Z][^A-Z]*)/, $titlecase;
+sub _snakecase {
+  return join '_', map lc($_), grep length($_), split /([A-Z][^A-Z]*)/, shift;
+}
 
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"__PACKAGE__::$snakecase"} = set_subname "__PACKAGE__::$snakecase", $cb;
+# Methods
+
+sub sleep {
+  my ($self, $duration) = @_;
+  Time::HiRes::sleep($duration);
+  return $self;
 }
 
 # Getters
-_add_method $_, sub { shift->dbus->$_(@_) } for qw(
+for my $m (qw(
   AutoAdvance
   Balance
   ConfigGet
@@ -69,10 +72,13 @@ _add_method $_, sub { shift->dbus->$_(@_) } for qw(
   Time
   Version
   Volume
-);
+)) {
+  Mojo::Util::monkey_patch __PACKAGE__, _snakecase($m),
+    sub { shift->dbus->$m(@_) };
+}
 
 # Setters and Others
-_add_method $_, sub { my $self = shift; $self->dbus->$_(@_); $self } for qw(
+for my $m (qw(
   Add
   AddList
   AddUrl
@@ -122,7 +128,10 @@ _add_method $_, sub { my $self = shift; $self->dbus->$_(@_); $self } for qw(
   ToggleRepeat
   ToggleShuffle
   ToggleStopAfter
-);
+)) {
+  Mojo::Util::monkey_patch __PACKAGE__, _snakecase($m),
+    sub { my $self = shift; $self->dbus->$m(@_); $self };
+}
 
 sub find_in_playlist {
   my ($self, $uri) = @_;
@@ -596,179 +605,397 @@ __DATA__
 </node>
 __END__
 
-=head1 GETTER METHODS
+=head1 METHODS
 
-=head2 auto_advance
+=head2 Getters
 
-=head2 balance
+=over 2
 
-=head2 config_get
+=item auto_advance
 
-=head2 get_active_playlist
+  $is_advance = $audacious->auto_advance
 
-=head2 get_active_playlist_name
+=item balance
 
-=head2 get_eq
+  $balance = $audacious->balance
 
-=head2 get_eq_band
+=item config_get
 
-=head2 get_eq_preamp
+  $value = $audacious->config_get($section, $name)
 
-=head2 get_info
+=item get_active_playlist
 
-=head2 get_playqueue_length
+  $plnum = $audacious->get_active_playlist
 
-=head2 get_tuple_fields
+=item get_active_playlist_name
 
-=head2 info
+  $plname = $audacious->get_active_playlist_name
 
-=head2 length
+=item get_eq
 
-=head2 main_win_visible
+  ($preamp, $bands) = $audacious->get_eq
 
-=head2 number_of_playlists
+=item get_eq_band
 
-=head2 paused
+  $value = $audacious->get_eq_band($band)
 
-=head2 playing
+=item get_eq_preamp
 
-=head2 plugin_is_enabled
+  $preamp = $audacious->get_eq_preamp
 
-=head2 position
+=item get_info
 
-=head2 queue_get_list_pos
+  ($rate, $freq, $nch) = $audacious->get_info
 
-=head2 queue_get_queue_pos
+=item get_playqueue_length
 
-=head2 recording
+  $length = $audacious->get_playqueue_length
 
-=head2 repeat
+=item get_tuple_fields
 
-=head2 select_displayed_playlist
+  $fields = $audacious->get_tuple_fields
 
-=head2 select_playing_playlist
+=item info
 
-=head2 shuffle
+  ($rate, $freq, $nch) = $audacious->info
 
-=head2 song_filename
+=item length
 
-=head2 song_frames
+  $length = $audacious->length
 
-=head2 song_length
+=item main_win_visible
 
-=head2 song_title
+  $is_main_win = $audacious->main_win_visible
 
-=head2 song_tuple
+=item number_of_playlists
 
-=head2 status
+  $count = $audacious->number_of_playlists
 
-=head2 stop_after
+=item paused
 
-=head2 stopped
+  $is_paused = $audacious->paused
 
-=head2 time
+=item playing
 
-=head2 version
+  $is_playing = $audacious->playing
 
-=head2 volume
+=item playqueue_is_queued
 
-=head1 SETTER METHODS
+  $is_queued = $audacious->playqueue_is_queued($pos)
 
-=head2 add
+=item plugin_is_enabled
 
-=head2 add_list
+  $enabled = $audacious->plugin_is_enabled($plugin)
 
-=head2 add_url
+=item position
 
-=head2 advance
+  $pos = $audacious->position
 
-=head2 advance_album
+=item queue_get_list_pos
 
-=head2 clear
+  $pos = $audacious->queue_get_list_pos($qpos)
 
-=head2 config_set
+=item queue_get_queue_pos
 
-=head2 delete
+  $qpos = $audacious->queue_get_queue_pos($pos)
 
-=head2 delete_active_playlist
+=item recording
 
-=head2 eject
+  $is_recording = $audacious->recording
 
-=head2 equalizer_activate
+=item repeat
 
-=head2 jump
+  $is_repeat = $audacious->repeat
 
-=head2 new_playlist
+=item shuffle
 
-=head2 open_list
+  $is_shuffle = $audacious->shuffle
 
-=head2 open_list_to_temp
+=item song_filename
 
-=head2 pause
+  $filename = $audacious->song_filename($pos)
 
-=head2 play
+=item song_frames
 
-=head2 play_active_playlist
+  $length = $audacious->song_frames($pos)
 
-=head2 playlist_add
+=item song_length
 
-=head2 playlist_enqueue_to_temp
+  $length = $audacious->song_length($pos)
 
-=head2 playlist_ins_url_string
+=item song_title
 
-=head2 play_pause
+  $title = $audacious->song_title($pos)
 
-=head2 playqueue_add
+=item song_tuple
 
-=head2 playqueue_clear
+  $value = $audacious->song_tuple($pos, $tuple)
 
-=head2 playqueue_is_queued
+=item status
 
-=head2 playqueue_remove
+  $status = $audacious->status
 
-=head2 plugin_enable
+=item stop_after
 
-=head2 quit
+  $is_stopping = $audacious->stop_after
 
-=head2 record
+=item stopped
 
-=head2 reverse
+  $is_stopped = $audacious->stopped
 
-=head2 reverse_album
+=item time
 
-=head2 seek
+  $time = $audacious->time
 
-=head2 set_active_playlist
+=item version
 
-=head2 set_active_playlist_name
+  $version = $audacious->version
 
-=head2 set_eq
+=item volume
 
-=head2 set_eq_band
+  ($vl, $vr) = $audacious->volume
 
-=head2 set_eq_preamp
+=back
 
-=head2 set_volume
 
-=head2 show_about_box
+=head2 Setters
 
-=head2 show_filebrowser
+=over 2
 
-=head2 show_jtf_box
+=item add
 
-=head2 show_main_win
+  $audacious->add($file)
 
-=head2 show_prefs_box
+=item add_list
 
-=head2 startup_notify
+  $audacious->add_list($filenames)
 
-=head2 stop
+=item add_url
 
-=head2 toggle_auto_advance
+  $audacious->add_url($url)
 
-=head2 toggle_repeat
+=item config_set
 
-=head2 toggle_shuffle
+  $audacious->config_set($section, $name, $value)
 
-=head2 toggle_stop_after
+=item delete
 
+  $audacious->delete($pos)
+
+=item delete_active_playlist
+
+  $audacious->delete_active_playlist
+
+=item new_playlist
+
+  $audacious->new_playlist
+
+=item open_list
+
+  $audacious->open_list($filenames)
+
+=item open_list_to_temp
+
+  $audacious->open_list_to_temp($filenames)
+
+=item playlist_add
+
+  $audacious->playlist_add($list)
+
+=item playlist_enqueue_to_temp
+
+  $audacious->playlist_enqueue_to_temp($url)
+
+=item playlist_ins_url_string
+
+  $audacious->playlist_ins_url_string($url, $pos)
+
+=item playqueue_add
+
+  $audacious->playqueue_add($pos)
+
+=item playqueue_clear
+
+  $audacious->playqueue_clear
+
+=item playqueue_remove
+
+  $audacious->playqueue_remove($pos)
+
+=item plugin_enable
+
+  $audacious->plugin_enable($plugin, $enable)
+
+=item select_displayed_playlist
+
+  $audacious->select_displayed_playlist
+
+=item select_playing_playlist
+
+  $audacious->select_playing_playlist
+
+=item set_active_playlist
+
+  $audacious->set_active_playlist($plnum)
+
+=item set_active_playlist_name
+
+  $audacious->set_active_playlist_name($plname)
+
+=item set_eq
+
+  $audacious->set_eq($preamp, $bands)
+
+=item set_eq_band
+
+  $audacious->set_eq_band($band, $value)
+
+=item set_eq_preamp
+
+  $audacious->set_eq_preamp($preamp)
+
+=item set_volume
+
+  $audacious->set_volume($vl, $vr)
+
+=item startup_notify
+
+  $audacious->startup_notify($id)
+
+=item toggle_auto_advance
+
+  $audacious->toggle_auto_advance
+
+=item toggle_repeat
+
+  $audacious->toggle_repeat
+
+=item toggle_shuffle
+
+  $audacious->toggle_shuffle
+
+=item toggle_stop_after
+
+  $audacious->toggle_stop_after
+
+=back
+
+
+=head2 Actions
+
+=over 2
+
+=item advance
+
+  $audacious->advance
+
+=item advance_album
+
+  $audacious->advance_album
+
+=item clear
+
+  $audacious->clear
+
+=item eject
+
+  $audacious->eject
+
+=item equalizer_activate
+
+  $audacious->equalizer_activate($active)
+
+=item jump
+
+  $audacious->jump($pos)
+
+=item pause
+
+  $audacious->pause
+
+=item play
+
+  $audacious->play
+
+=item play_active_playlist
+
+  $audacious->play_active_playlist
+
+=item play_pause
+
+  $audacious->play_pause
+
+=item quit
+
+  $audacious->quit
+
+=item record
+
+  $audacious->record
+
+=item reverse
+
+  $audacious->reverse
+
+=item reverse_album
+
+  $audacious->reverse_album
+
+=item seek
+
+  $audacious->seek($pos)
+
+=item show_about_box
+
+  $audacious->show_about_box($show)
+
+=item show_filebrowser
+
+  $audacious->show_filebrowser($show)
+
+=item show_jtf_box
+
+  $audacious->show_jtf_box($show)
+
+=item show_main_win
+
+  $audacious->show_main_win($show)
+
+=item show_prefs_box
+
+  $audacious->show_prefs_box($show)
+
+=item stop
+
+  $audacious->stop
+
+=back
+
+
+=head2 Others
+
+=over 2
+
+=item sleep
+
+  $audacious->pause->sleep(1.2)->play
+
+Sleep for the specified number of seconds.
+
+=back
+
+
+=head1 SUPPORT
+
+See L<Mojar>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2017--2018 Nic Sandfield.  All rights reserved.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 SEE ALSO
+
+L<Net::DBus>
